@@ -1,6 +1,4 @@
-# RSA homomorphic encryption demo
-
-<https://bquast.github.io/homomorphic-encryption>
+# homomorphic encryption demos
 
 Standard RSA partial homomorphic property demonstration:
 
