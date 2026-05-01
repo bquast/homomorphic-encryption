@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFV Homomorphic Encryption Demo</title>
+    <!-- Loading Genesis typography -->
+    <link href="https://api.fontshare.com/v2/css?f[]=general-sans@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>BFV Encryption Demo</h1>
+        <p class="subhead">A zero-dependency implementation of homomorphic addition.</p>
+    </header>
+
+    <main class="grid-layout">
+        <section class="card control-panel">
+            <h2>Controls</h2>
+            
+            <div class="section-divider">
+                <h3>1. Setup Phase</h3>
+                <p class="text-secondary">Generate Public Key (pk) and Secret Key (sk). Parameters: n=8, q=12289, t=256.</p>
+                <button id="btnKeygen" class="btn btn-primary">Generate Keys</button>
+                <div id="keyStatus" class="status-indicator hidden">
+                    <span class="dot success"></span> Keys Active
+                </div>
+            </div>
+
+            <div class="section-divider disabled-overlay" id="encryptionStep">
+                <h3>2. Encryption Phase</h3>
+                <p class="text-secondary">Enter two integers (0-255) to encrypt.</p>
+                <div class="input-group">
+                    <label for="num1">Number A:</label>
+                    <input type="number" id="num1" min="0" max="255" value="42">
+                </div>
+                <div class="input-group">
+                    <label for="num2">Number B:</label>
+                    <input type="number" id="num2" min="0" max="255" value="15">
+                </div>
+                <button id="btnEncrypt" class="btn btn-secondary">Encrypt Values</button>
+            </div>
+
+            <div class="section-divider disabled-overlay" id="computationStep">
+                <h3>3. Computation Phase (Cloud)</h3>
+                <p class="text-secondary">Perform addition on the encrypted ciphertexts without knowing the raw data.</p>
+                <button id="btnAddCipher" class="btn btn-secondary">Add Ciphertexts (CtxA + CtxB)</button>
+            </div>
+
+            <div class="section-divider disabled-overlay" id="decryptionStep">
+                <h3>4. Decryption Phase</h3>
+                <p class="text-secondary">Use the secret key to decrypt the result.</p>
+                <button id="btnDecrypt" class="btn btn-primary">Decrypt Result</button>
+            </div>
+        </section>
+
+        <section class="card log-panel">
+            <h2>Operation Log</h2>
+            <div id="logOutput" class="log-container">
+                <p class="text-secondary">Waiting for action...</p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="bfv.js"></script>
+</body>
+</html>
