@@ -3,101 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CKKS Encoder - Genesis Design</title>
-    <!-- Fonts: General Sans, DM Sans, JetBrains Mono -->
+    <title>CKKS Homomorphic Encryption Pipeline</title>
+    <!-- Genesis Typography -->
     <link href="https://api.fontshare.com/v2/css?f[]=general-sans@600,700&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <h1>CKKS Encoder</h1>
-                <span class="badge brand-highlight">DESIGN.md</span>
-            </div>
-            <div class="nav-links">
-                <a href="#">Documentation</a>
-                <a href="#">Settings</a>
-                <div class="avatar"></div>
-            </div>
-        </div>
-    </nav>
-
-    <main class="container">
-        <header class="page-header">
-            <h2 class="display-title">CKKS Precision Encoding</h2>
-            <p class="subtitle">Discretize, encode, and decode complex vectors into polynomial representations.</p>
+    <div class="container">
+        <header>
+            <h1>CKKS Scheme Pipeline</h1>
+            <p class="subhead">Interactive demonstration of Encoding, Encryption, Decryption, and Decoding.</p>
         </header>
 
-        <div class="grid">
-            <!-- Left Column: Inputs -->
-            <div class="column">
-                <div class="card param-card">
-                    <h3 class="section-title">Parameters</h3>
-                    <div class="input-group-row">
-                        <div class="input-group">
-                            <label for="input-m">Polynomial Degree (M)</label>
-                            <input type="number" id="input-m" class="input" value="8" step="4" min="4">
-                        </div>
-                        <div class="input-group">
-                            <label for="input-scale">Scaling Factor (Δ)</label>
-                            <input type="number" id="input-scale" class="input" value="64" step="1" min="1">
-                        </div>
+        <main class="grid-layout">
+            <section class="card control-panel">
+                <h2>Pipeline Stages</h2>
+
+                <!-- Parameters -->
+                <div class="params-row">
+                    <div class="input-group">
+                        <label for="param-m">Cyclotomic Order (M)</label>
+                        <input type="number" id="param-m" class="input" value="8" min="4" step="4">
+                    </div>
+                    <div class="input-group">
+                        <label for="param-scale">Scale (Δ)</label>
+                        <input type="number" id="param-scale" class="input" value="64">
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="section-title">Vector (z)</h3>
-                        <span class="chip" id="vector-size-badge">N = 2</span>
-                    </div>
-                    <div class="vector-inputs" id="vector-inputs-container">
-                        <!-- Dynamically populated by JS -->
-                    </div>
-                    <button class="btn btn-primary" id="run-btn" style="margin-top: 24px; width: 100%;">
-                        Encode & Decode Vector
-                    </button>
-                </div>
-            </div>
-
-            <!-- Right Column: Outputs -->
-            <div class="column">
-                <div class="card result-card">
-                    <div class="card-header">
-                        <h3 class="section-title">Encoded Polynomial <span class="badge-status success"></span></h3>
-                    </div>
-                    <p class="description">The randomly rounded polynomial representation p(X).</p>
-                    <div class="code-block" id="output-poly">
-                        Awaiting execution...
-                    </div>
+                <div class="section-divider" id="step-encode">
+                    <h3>1. Vector Encoding</h3>
+                    <p class="text-secondary">Converts complex vector to an integer polynomial.</p>
+                    <div id="vector-inputs" class="vector-inputs-container"></div>
+                    <button id="btn-encode" class="btn btn-primary">Encode Vector</button>
                 </div>
 
-                <div class="card result-card">
-                    <div class="card-header">
-                        <h3 class="section-title">Decoded Vector</h3>
-                    </div>
-                    <p class="description">Resulting vector after decoding p(X) back to C^N.</p>
-                    <div class="code-block" id="output-decoded">
-                        Awaiting execution...
-                    </div>
+                <div class="section-divider disabled-overlay" id="step-keygen">
+                    <h3>2. Key Generation (RLWE)</h3>
+                    <p class="text-secondary">Generates Secret (sk) and Public (pk) keys over the polynomial ring.</p>
+                    <button id="btn-keygen" class="btn btn-secondary">Generate Keys</button>
                 </div>
-                
-                <div class="card result-card">
-                    <div class="card-header">
-                        <h3 class="section-title">Difference / Error</h3>
-                    </div>
-                    <p class="description">Absolute difference between Original and Decoded vectors.</p>
-                    <div class="code-block" id="output-error">
-                        Awaiting execution...
-                    </div>
+
+                <div class="section-divider disabled-overlay" id="step-encrypt">
+                    <h3>3. Encryption</h3>
+                    <p class="text-secondary">Encrypts polynomial m(X) using pk into ciphertext pair (c0, c1).</p>
+                    <button id="btn-encrypt" class="btn btn-secondary">Encrypt Polynomial</button>
                 </div>
-            </div>
-        </div>
-    </main>
+
+                <div class="section-divider disabled-overlay" id="step-decrypt">
+                    <h3>4. Decryption</h3>
+                    <p class="text-secondary">Decrypts ciphertext using sk to recover noisy m'(X).</p>
+                    <button id="btn-decrypt" class="btn btn-secondary">Decrypt Ciphertext</button>
+                </div>
+
+                <div class="section-divider disabled-overlay" id="step-decode">
+                    <h3>5. Vector Decoding</h3>
+                    <p class="text-secondary">Evaluates m'(X) and scales down to recover approximate vector z'.</p>
+                    <button id="btn-decode" class="btn btn-primary">Decode Polynomial</button>
+                </div>
+            </section>
+
+            <section class="card log-panel">
+                <h2>Execution Log</h2>
+                <div id="log-output" class="log-container">
+                    <p class="text-secondary">Adjust parameters and click "Encode Vector" to begin...</p>
+                </div>
+            </section>
+        </main>
+    </div>
 
     <script src="ckks.js"></script>
 </body>
