@@ -4,478 +4,270 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RSA — Multiplicative Homomorphism</title>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Work+Sans:wght@400;600&family=Space+Mono&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --black: #000;
-  --white: #fff;
-  --success: #008000;
-  --warning: #FFA500;
-  --error: #FF0000;
-  --surface-sunken: #F0F0F0;
-  --font-head: 'Archivo Black', sans-serif;
-  --font-body: 'Work Sans', sans-serif;
-  --font-mono: 'Space Mono', monospace;
-}
-
-body {
-  background: var(--white);
-  color: var(--black);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.6;
-  min-height: 100vh;
-}
-
-/* LAYOUT */
-header {
-  border-bottom: 5px solid var(--black);
-  padding: 40px;
-}
-header h1 {
-  font-family: var(--font-head);
-  font-size: 48px;
-  line-height: 1.05;
-  text-transform: uppercase;
-}
-header p {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  margin-top: 8px;
-  color: #444;
-}
-
-main { padding: 40px; max-width: 1100px; }
-
-/* SECTION LABELS */
-.sec-label {
-  font-family: var(--font-head);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  border-bottom: 3px solid var(--black);
-  padding-bottom: 6px;
-  margin-bottom: 20px;
-}
-
-/* CARDS */
-.card {
-  border: 3px solid var(--black);
-  padding: 24px;
-  background: var(--white);
-}
-.card-inv {
-  border: 3px solid var(--black);
-  padding: 20px;
-  background: var(--black);
-  color: var(--white);
-}
-.card-sunken {
-  border: 3px solid var(--black);
-  padding: 16px 20px;
-  background: var(--surface-sunken);
-}
-
-/* GRIDS */
-.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-
-section { margin-bottom: 40px; }
-
-/* INPUTS */
-label {
-  display: block;
-  font-family: var(--font-head);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 4px;
-}
-input[type=number] {
-  width: 100%;
-  font-family: var(--font-mono);
-  font-size: 20px;
-  padding: 10px 12px;
-  border: 3px solid var(--black);
-  background: var(--surface-sunken);
-  color: var(--black);
-  outline: none;
-}
-input[type=number]:focus { border-width: 5px; }
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button { opacity: 1; }
-
-/* MONO DISPLAY VALUES */
-.val {
-  font-family: var(--font-mono);
-  font-size: 22px;
-  font-weight: 400;
-  line-height: 1.2;
-  word-break: break-all;
-}
-.val-sm {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  color: #555;
-  margin-top: 4px;
-  line-height: 1.4;
-}
-.lbl-sm {
-  font-family: var(--font-head);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 6px;
-}
-.lbl-sm-inv {
-  font-family: var(--font-head);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 6px;
-  color: #aaa;
-}
-.val-inv { font-family: var(--font-mono); font-size: 22px; color: var(--white); }
-.val-sm-inv { font-family: var(--font-mono); font-size: 13px; color: #888; margin-top: 4px; }
-
-/* ARROW */
-.arrow-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.arrow-row > * { flex: 1; }
-.arr {
-  flex: 0 0 auto !important;
-  font-family: var(--font-mono);
-  font-size: 20px;
-  font-weight: 700;
-}
-
-/* RESULT BAR */
-.result-bar {
-  border: 5px solid var(--black);
-  padding: 24px 32px;
-  display: flex;
-  align-items: flex-start;
-  gap: 32px;
-  flex-wrap: wrap;
-}
-.result-bar.ok { border-color: var(--success); }
-.result-bar.fail { border-color: var(--error); }
-
-.chip {
-  font-family: var(--font-head);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 3px 10px;
-  border: 2px solid;
-  display: inline-block;
-  white-space: nowrap;
-}
-.chip-ok { color: var(--success); border-color: var(--success); }
-.chip-fail { color: var(--error); border-color: var(--error); }
-.chip-warn { color: var(--warning); border-color: var(--warning); }
-
-.result-eq {
-  font-family: var(--font-mono);
-  font-size: 16px;
-  flex: 1;
-  min-width: 200px;
-}
-.result-note {
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: #555;
-  margin-top: 10px;
-  width: 100%;
-}
-
-/* PROP BOX */
-.prop-box {
-  border: 3px solid var(--black);
-  background: var(--black);
-  color: var(--white);
-  padding: 20px 24px;
-  font-family: var(--font-mono);
-  font-size: 15px;
-  margin-bottom: 16px;
-}
-
-/* WARN */
-#warn-msg { display: none; margin-top: 8px; }
-
-/* FOOTER */
-footer {
-  border-top: 3px solid var(--black);
-  padding: 24px 40px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: #666;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 40px;
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-  <h1>RSA<br>Homomorphic<br>Property</h1>
-  <p>Educational demo &mdash; does not provide actual protection &mdash; Bastiaan Quast &mdash; bastiaanquast.com</p>
-</header>
+<nav>
+  <a class="nav-logo" href="#">DESIGN<span>.md</span></a>
+  <div class="nav-links">
+    <a class="nav-link active" href="#">RSA Demo</a>
+    <a class="nav-link" href="https://bastiaanquast.com">bastiaanquast.com</a>
+  </div>
+</nav>
 
 <main>
+  <div class="container">
 
-  <!-- KEY PARAMETERS -->
-  <section>
-    <p class="sec-label">01 &mdash; Key parameters</p>
-    <div class="g2" style="gap:24px">
+    <!-- HERO -->
+    <section class="hero">
+      <span class="hero-label">Cryptography · Educational</span>
+      <h1>RSA Multiplicative Homomorphism</h1>
+      <p>Multiply two ciphertexts, decrypt once — and get the product of the original plaintexts. No plaintext ever required on the server.</p>
+      <p class="hero-note">Educational example — does not provide actual cryptographic protection — Bastiaan Quast</p>
+    </section>
 
-      <div class="card">
-        <p class="sec-label" style="font-size:11px;margin-bottom:16px">Primes</p>
-        <div class="g2">
-          <div>
-            <label for="inp-p">P (prime)</label>
-            <input type="number" id="inp-p" value="2" min="2" max="97">
-          </div>
-          <div>
-            <label for="inp-q">Q (prime)</label>
-            <input type="number" id="inp-q" value="7" min="2" max="97">
-          </div>
-        </div>
+    <!-- 01 KEY PARAMETERS -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <span class="section-title">Key parameters</span>
       </div>
 
-      <div>
-        <div class="g2" style="margin-bottom:16px">
-          <div class="card-sunken">
-            <p class="lbl-sm">n = P &middot; Q</p>
-            <p class="val" id="out-n">14</p>
-          </div>
-          <div class="card-sunken">
-            <p class="lbl-sm">&phi;(n) = (P&minus;1)(Q&minus;1)</p>
-            <p class="val" id="out-phi">6</p>
-          </div>
-        </div>
-        <div class="g2">
-          <div class="card-inv">
-            <p class="lbl-sm-inv">e &mdash; public exponent</p>
-            <p class="val-inv" id="out-e">5</p>
-            <p class="val-sm-inv" id="out-e-check">gcd(e,&phi;)=1 ✓</p>
-          </div>
-          <div class="card-inv">
-            <p class="lbl-sm-inv">d &mdash; private exponent</p>
-            <p class="val-inv" id="out-d">5</p>
-            <p class="val-sm-inv" id="out-d-check">e&middot;d mod &phi; = 1 ✓</p>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- PLAINTEXTS -->
-  <section>
-    <p class="sec-label">02 &mdash; Plaintext inputs</p>
-    <div class="g2" style="gap:24px;align-items:start">
       <div class="g2">
+        <div class="card">
+          <p class="data-label" style="margin-bottom:16px">Choose two primes</p>
+          <div class="g2">
+            <div class="field">
+              <label for="inp-p">P (prime)</label>
+              <input type="number" id="inp-p" value="2" min="2" max="97">
+            </div>
+            <div class="field">
+              <label for="inp-q">Q (prime)</label>
+              <input type="number" id="inp-q" value="7" min="2" max="97">
+            </div>
+          </div>
+
+          <div class="g3" style="margin-top:16px">
+            <div class="card-flat">
+              <p class="data-label">n = P · Q</p>
+              <p class="data-val" id="out-n">14</p>
+            </div>
+            <div class="card-flat">
+              <p class="data-label">φ(n)</p>
+              <p class="data-val" id="out-phi">6</p>
+            </div>
+            <div class="card-flat">
+              <p class="data-label">modulus n²</p>
+              <p class="data-val" id="out-n2">196</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="data-label" style="margin-bottom:4px">Derived key pair</p>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">e is chosen as the smallest odd integer coprime to φ(n). d is its modular inverse.</p>
+          <div class="key-grid">
+            <div class="key-card">
+              <p class="data-label">e — public exponent</p>
+              <p class="data-val" id="out-e">5</p>
+              <p class="data-check" id="out-e-check">gcd(e, φ) = 1 ✓</p>
+            </div>
+            <div class="key-card">
+              <p class="data-label">d — private exponent</p>
+              <p class="data-val" id="out-d">5</p>
+              <p class="data-check" id="out-d-check">e · d mod φ = 1 ✓</p>
+            </div>
+          </div>
+          <div class="card-flat" style="margin-top:12px">
+            <p class="data-label">encryption / decryption</p>
+            <p class="data-formula" style="font-size:13px;color:var(--text-secondary)">
+              encrypt: <span style="color:var(--primary)">c = m<sup>e</sup> mod n²</span>
+              &nbsp;&nbsp;·&nbsp;&nbsp;
+              decrypt: <span style="color:var(--text-primary)">m = c<sup>d</sup> mod n</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 PLAINTEXT INPUTS -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <span class="section-title">Plaintext inputs</span>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="g2">
+            <div class="field">
+              <label for="inp-m1">m₁</label>
+              <input type="number" id="inp-m1" value="3" min="1">
+            </div>
+            <div class="field">
+              <label for="inp-m2">m₂</label>
+              <input type="number" id="inp-m2" value="4" min="1">
+            </div>
+          </div>
+          <div id="warn-msg">
+            <span class="chip chip-warn">Warning</span>
+            <span style="font-size:13px;color:var(--text-secondary);margin-left:8px">Inputs should be &lt; n for well-defined results</span>
+          </div>
+        </div>
+
+        <div class="card-accent">
+          <p class="data-label">plaintext product m₁ · m₂ mod n</p>
+          <p class="data-val-lg" id="out-plainprod">12</p>
+          <p style="font-size:13px;color:var(--text-secondary);margin-top:8px">This is the target value. Decrypting the cipher product must yield this.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 ENCRYPTION & DECRYPTION -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <span class="section-title">Encryption &amp; decryption</span>
+      </div>
+
+      <div class="g3">
+
         <div>
-          <label for="inp-m1">m&#8321;</label>
-          <input type="number" id="inp-m1" value="3" min="1">
+          <p class="data-label" style="margin-bottom:12px">Encrypt m₁</p>
+          <div class="flow-row">
+            <div class="card-flat flow-cipher">
+              <p class="data-label">c₁</p>
+              <p class="data-val" id="out-c1">47</p>
+              <p class="data-formula" id="out-c1f">3⁵ mod 196</p>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="card-flat">
+              <p class="data-label">decrypt(c₁)</p>
+              <p class="data-val" id="out-dc1">3</p>
+              <p class="data-formula" id="out-dc1f">47⁵ mod 14</p>
+            </div>
+          </div>
         </div>
+
         <div>
-          <label for="inp-m2">m&#8322;</label>
-          <input type="number" id="inp-m2" value="4" min="1">
-        </div>
-      </div>
-      <div class="card" style="border-width:5px">
-        <p class="lbl-sm">plaintext product m&#8321;&middot;m&#8322; mod n</p>
-        <p class="val" style="font-size:32px" id="out-plainprod">12</p>
-        <p class="val-sm" style="margin-top:8px">encrypt: c = m<sup>e</sup> mod n&sup2; &nbsp;/&nbsp; decrypt: m = c<sup>d</sup> mod n</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ENCRYPTION / DECRYPTION -->
-  <section>
-    <p class="sec-label">03 &mdash; Encryption &amp; decryption</p>
-    <div class="g3" style="gap:16px">
-
-      <div>
-        <p class="lbl-sm" style="margin-bottom:12px">encrypt(m&#8321;)</p>
-        <div class="arrow-row">
-          <div class="card-sunken">
-            <p class="lbl-sm">c&#8321;</p>
-            <p class="val" id="out-c1">47</p>
-            <p class="val-sm" id="out-c1f">3&#8309; mod 196</p>
-          </div>
-          <span class="arr">&rarr;</span>
-          <div class="card-sunken">
-            <p class="lbl-sm">decrypt(c&#8321;)</p>
-            <p class="val" id="out-dc1">3</p>
-            <p class="val-sm" id="out-dc1f">47&#8309; mod 14</p>
+          <p class="data-label" style="margin-bottom:12px">Encrypt m₂</p>
+          <div class="flow-row">
+            <div class="card-flat flow-cipher">
+              <p class="data-label">c₂</p>
+              <p class="data-val" id="out-c2">44</p>
+              <p class="data-formula" id="out-c2f">4⁵ mod 196</p>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="card-flat">
+              <p class="data-label">decrypt(c₂)</p>
+              <p class="data-val" id="out-dc2">4</p>
+              <p class="data-formula" id="out-dc2f">44⁵ mod 14</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div>
-        <p class="lbl-sm" style="margin-bottom:12px">encrypt(m&#8322;)</p>
-        <div class="arrow-row">
-          <div class="card-sunken">
-            <p class="lbl-sm">c&#8322;</p>
-            <p class="val" id="out-c2">44</p>
-            <p class="val-sm" id="out-c2f">4&#8309; mod 196</p>
-          </div>
-          <span class="arr">&rarr;</span>
-          <div class="card-sunken">
-            <p class="lbl-sm">decrypt(c&#8322;)</p>
-            <p class="val" id="out-dc2">4</p>
-            <p class="val-sm" id="out-dc2f">44&#8309; mod 14</p>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <p class="lbl-sm" style="margin-bottom:12px">cipher product (no decryption)</p>
-        <div class="arrow-row">
-          <div class="card-inv" style="flex:1">
-            <p class="lbl-sm-inv">c&#8321;&middot;c&#8322; mod n&sup2;</p>
-            <p class="val-inv" id="out-cp">108</p>
-            <p class="val-sm-inv" id="out-cpf">47&middot;44 mod 196</p>
-          </div>
-          <span class="arr">&rarr;</span>
-          <div class="card-inv" style="flex:1">
-            <p class="lbl-sm-inv">decrypt</p>
-            <p class="val-inv" id="out-dcp">12</p>
-            <p class="val-sm-inv" id="out-dcpf">108&#8309; mod 14</p>
+        <div>
+          <p class="data-label" style="margin-bottom:12px">Cipher product (no decryption needed yet)</p>
+          <div class="flow-row">
+            <div class="card-flat flow-product">
+              <p class="data-label">c₁ · c₂ mod n²</p>
+              <p class="data-val" id="out-cp">108</p>
+              <p class="data-formula" id="out-cpf">47 · 44 mod 196</p>
+            </div>
+            <span class="flow-arrow">→</span>
+            <div class="card-flat">
+              <p class="data-label">decrypt</p>
+              <p class="data-val" id="out-dcp">12</p>
+              <p class="data-formula" id="out-dcpf">108⁵ mod 14</p>
+            </div>
           </div>
         </div>
+
+      </div>
+    </section>
+
+    <!-- 04 RESULT -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <span class="section-title">Homomorphic result</span>
       </div>
 
-    </div>
-  </section>
+      <div class="prop-box">
+        decrypt(c₁ · c₂ mod n²) ≡ m₁ · m₂ (mod n)
+      </div>
 
-  <!-- RESULT -->
-  <section>
-    <p class="sec-label">04 &mdash; Result</p>
+      <div class="result-panel" id="result-panel">
+        <div class="result-row">
+          <span class="chip" id="result-badge">homomorphism holds</span>
+          <span class="result-eq" id="result-eq">decrypt(c₁·c₂ mod n²) = 12 = 3·4 mod 14</span>
+        </div>
+        <p class="result-desc">
+          RSA is multiplicatively homomorphic: a party can multiply two ciphertexts and — upon decryption — recover the product of the original plaintexts. Neither plaintext m₁ nor m₂ was ever revealed. The use of n² as the encryption modulus (rather than n) is what gives the cipher product enough headroom to survive decryption correctly.
+        </p>
+      </div>
+    </section>
 
-    <div class="prop-box">
-      decrypt(c&#8321; &middot; c&#8322; mod n&sup2;) &equiv; m&#8321; &middot; m&#8322; (mod n)
-    </div>
-
-    <div class="result-bar" id="result-bar">
-      <span id="result-badge" class="chip chip-ok">homomorphism holds</span>
-      <span class="result-eq" id="result-eq">decrypt(c&#8321;&middot;c&#8322; mod n&sup2;) = 12 = 3&middot;4 mod 14</span>
-      <p class="result-note">
-        RSA is multiplicatively homomorphic: multiplying two ciphertexts and decrypting yields the same result as multiplying the plaintexts directly. The server never sees m&#8321; or m&#8322; &mdash; only their encryptions.
-      </p>
-      <p id="warn-msg"><span class="chip chip-warn">warning</span>&nbsp; inputs should be &lt; n for well-defined results</p>
-    </div>
-  </section>
-
+  </div>
 </main>
 
 <footer>
-  <span>Bastiaan Quast &mdash; bquast@gmail.com &mdash; bastiaanquast.com</span>
-  <span>Educational example &mdash; does not provide actual cryptographic protection</span>
+  <span>Bastiaan Quast &mdash; <a href="mailto:bquast@gmail.com">bquast@gmail.com</a> &mdash; <a href="https://bastiaanquast.com">bastiaanquast.com</a></span>
+  <span>Educational example — does not provide actual cryptographic protection</span>
 </footer>
 
-<script>
-function modpow(base, exp, mod) {
-  if (mod === 1n) return 0n;
-  let result = 1n;
-  base = base % mod;
-  while (exp > 0n) {
-    if (exp % 2n === 1n) result = result * base % mod;
-    exp = exp >> 1n;
-    base = base * base % mod;
-  }
-  return result;
-}
-function gcd(a, b) { return b === 0n ? a : gcd(b, a % b); }
-function modInv(a, m) {
-  let [old_r, r] = [a, m];
-  let [old_s, s] = [1n, 0n];
-  while (r !== 0n) {
-    const q = old_r / r;
-    [old_r, r] = [r, old_r - q * r];
-    [old_s, s] = [s, old_s - q * s];
-  }
-  return ((old_s % m) + m) % m;
-}
-function findE(phi) {
-  for (let e = 3n; e < phi; e += 2n) if (gcd(e, phi) === 1n) return e;
-  return 3n;
-}
+<script type="module">
+import { compute } from './rsa.js';
 
-function recalc() {
-  const P = BigInt(parseInt(document.getElementById('inp-p').value) || 2);
-  const Q = BigInt(parseInt(document.getElementById('inp-q').value) || 7);
-  const m1 = BigInt(parseInt(document.getElementById('inp-m1').value) || 3);
-  const m2 = BigInt(parseInt(document.getElementById('inp-m2').value) || 4);
+function set(id, val) { document.getElementById(id).textContent = val; }
 
-  const n = P * Q;
-  const phi = (P - 1n) * (Q - 1n);
-  const e = findE(phi);
-  let d;
-  try { d = modInv(e, phi); } catch { d = 1n; }
+function render() {
+  const P  = parseInt(document.getElementById('inp-p').value)  || 2;
+  const Q  = parseInt(document.getElementById('inp-q').value)  || 7;
+  const m1 = parseInt(document.getElementById('inp-m1').value) || 3;
+  const m2 = parseInt(document.getElementById('inp-m2').value) || 4;
 
-  const n2 = n * n;
-  const c1 = modpow(m1, e, n2);
-  const c2 = modpow(m2, e, n2);
-  const cp = (c1 * c2) % n2;
-  const dc1 = modpow(c1, d, n);
-  const dc2 = modpow(c2, d, n);
-  const dcp = modpow(cp, d, n);
-  const plainprod = (m1 * m2) % n;
+  const r = compute(P, Q, m1, m2);
 
-  document.getElementById('out-n').textContent = n.toString();
-  document.getElementById('out-phi').textContent = phi.toString();
-  document.getElementById('out-e').textContent = e.toString();
-  document.getElementById('out-e-check').textContent = `gcd(${e}, ${phi}) = 1 \u2713`;
-  document.getElementById('out-d').textContent = d.toString();
-  document.getElementById('out-d-check').textContent = `e\u00b7d mod \u03c6 = ${(e*d)%phi} \u2713`;
+  set('out-n',        r.n.toString());
+  set('out-phi',      r.phi.toString());
+  set('out-n2',       r.n2.toString());
+  set('out-e',        r.e.toString());
+  set('out-e-check',  `gcd(${r.e}, ${r.phi}) = 1 ✓`);
+  set('out-d',        r.d.toString());
+  set('out-d-check',  `e·d mod φ = ${(r.e * r.d) % r.phi} ✓`);
+  set('out-plainprod', r.plainprod.toString());
 
-  document.getElementById('out-plainprod').textContent = plainprod.toString();
+  set('out-c1',  r.c1.toString());
+  set('out-c1f', `${m1}^${r.e} mod ${r.n2}`);
+  set('out-dc1', r.dc1.toString());
+  set('out-dc1f',`${r.c1}^${r.d} mod ${r.n}`);
 
-  document.getElementById('out-c1').textContent = c1.toString();
-  document.getElementById('out-c1f').textContent = `${m1}^${e} mod ${n2}`;
-  document.getElementById('out-dc1').textContent = dc1.toString();
-  document.getElementById('out-dc1f').textContent = `${c1}^${d} mod ${n}`;
+  set('out-c2',  r.c2.toString());
+  set('out-c2f', `${m2}^${r.e} mod ${r.n2}`);
+  set('out-dc2', r.dc2.toString());
+  set('out-dc2f',`${r.c2}^${r.d} mod ${r.n}`);
 
-  document.getElementById('out-c2').textContent = c2.toString();
-  document.getElementById('out-c2f').textContent = `${m2}^${e} mod ${n2}`;
-  document.getElementById('out-dc2').textContent = dc2.toString();
-  document.getElementById('out-dc2f').textContent = `${c2}^${d} mod ${n}`;
+  set('out-cp',  r.cp.toString());
+  set('out-cpf', `${r.c1} · ${r.c2} mod ${r.n2}`);
+  set('out-dcp', r.dcp.toString());
+  set('out-dcpf',`${r.cp}^${r.d} mod ${r.n}`);
 
-  document.getElementById('out-cp').textContent = cp.toString();
-  document.getElementById('out-cpf').textContent = `${c1}\u00b7${c2} mod ${n2}`;
-  document.getElementById('out-dcp').textContent = dcp.toString();
-  document.getElementById('out-dcpf').textContent = `${cp}^${d} mod ${n}`;
-
-  const holds = dcp === plainprod;
-  const bar = document.getElementById('result-bar');
-  bar.className = 'result-bar ' + (holds ? 'ok' : 'fail');
+  const panel = document.getElementById('result-panel');
   const badge = document.getElementById('result-badge');
-  badge.textContent = holds ? 'homomorphism holds' : 'mismatch';
-  badge.className = 'chip ' + (holds ? 'chip-ok' : 'chip-fail');
-  document.getElementById('result-eq').textContent =
-    `decrypt(c\u2081\u00b7c\u2082 mod n\u00b2) = ${dcp} = ${m1}\u00b7${m2} mod ${n}`;
+  panel.className = 'result-panel ' + (r.holds ? 'ok' : 'fail');
+  badge.className  = 'chip ' + (r.holds ? 'chip-ok' : 'chip-fail');
+  badge.textContent = r.holds ? 'Homomorphism holds' : 'Mismatch';
+  set('result-eq', `decrypt(c₁·c₂ mod n²) = ${r.dcp} = ${m1}·${m2} mod ${r.n}`);
 
-  const warn = m1 >= n || m2 >= n;
-  document.getElementById('warn-msg').style.display = warn ? 'block' : 'none';
+  document.getElementById('warn-msg').style.display = r.warn ? 'flex' : 'none';
 }
 
 ['inp-p','inp-q','inp-m1','inp-m2'].forEach(id =>
-  document.getElementById(id).addEventListener('input', recalc)
+  document.getElementById(id).addEventListener('input', render)
 );
-recalc();
+render();
 </script>
 </body>
 </html>
