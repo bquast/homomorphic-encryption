@@ -6,17 +6,17 @@ Demo landing page:
 
 <https://bquast.github.io/homomorphic-encryption>
 
-## RSA
+### RSA
 
 Standard RSA partial homomorphic property demonstration:
 
 <https://bquast.github.io/homomorphic-encryption/rsa>
 
-## BFV
+### BFV
 
 <https://bquast.github.io/homomorphic-encryption/bfv>
 
-## CKKS
+### CKKS
 
 <https://bquast.github.io/homomorphic-encryption/ckks>
 
@@ -26,6 +26,9 @@ Standard RSA partial homomorphic property demonstration:
 Benaissa, Ayoub (2020); Build an Homomorphic Encryption Scheme from Scratch with Python; OpenMined.com:
 <https://openmined.org/blog/build-an-homomorphic-encryption-scheme-from-scratch-with-python/>
 
+Bolboceanu, Mădălina (2020); Homomorphic Encryption: a Toy Implementation in Python; Bitdefender AI Research:
+<https://bit-ml.github.io/blog/homomorphic-encryption-toy-implementation-in-python>
+
 Falcetta, Alessandro (2022); Introduction to BFV HE ML; WCCI 2022 / Github.com:
 <https://github.com/AI-Tech-Research-Lab/Introduction-to-BFV-HE-ML>
 
@@ -33,3 +36,4 @@ Hardy, Stephen (2021); A Homomorphic Encryption Illustrated Primer, Humanata.com
 
 Hoanger, Louie (2022); Introduction to the CKKS encryption scheme, Inferati.com; Web Archive snapshot:
 <https://web.archive.org/web/20250130095337/https://www.inferati.com/blog/fhe-schemes-ckks>
+
