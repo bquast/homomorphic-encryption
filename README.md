@@ -2,6 +2,8 @@
 
 [Grokking Grok explanation of Homomorphic Encryption](https://grok.com/share/c2hhcmQtMg_776a4ad3-9199-4128-a39f-b9891d03ff64)
 
+Demo landing page:
+
 <https://bquast.github.io/homomorphic-encryption>
 
 ## RSA
