@@ -16,6 +16,10 @@ Standard RSA partial homomorphic property demonstration:
 
 <https://bquast.github.io/homomorphic-encryption/bfv>
 
+### BGV
+
+<https://bquast.github.io/homomorphic-encryption/bgv>
+
 ### CKKS
 
 <https://bquast.github.io/homomorphic-encryption/ckks>
